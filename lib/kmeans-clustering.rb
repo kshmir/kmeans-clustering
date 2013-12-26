@@ -1,6 +1,4 @@
 module KMeansClustering
-  require 'cabiri'
-
   # add static attributes through attr_accessor
   class << self
     attr_accessor :calcSum
@@ -25,30 +23,17 @@ module KMeansClustering
     groups
   end
 
-  def self.run(centers, elements, nb_iterations, nb_jobs)
+  def self.run(centers, elements, nb_iterations)
     nb_iterations.times do
       # create jobs
-      jobs = []
-      elements_for_jobs = split_array_into_parts(elements, nb_jobs)
-      nb_jobs.times do |i|
-        jobs << Job.new(centers, elements_for_jobs[i])
-      end
-
-      # run jobs in parallel
-      queue = Cabiri::JobQueue.new
-      nb_jobs.times do |i|
-        queue.add(i) { jobs[i].run }
-      end
-      queue.start(nb_jobs)
+      job = Job.new(centers, elements)
 
       # sort aggregated proximity data by center
       sorted_aggregated_proximity_data = Hash.new { |h,k| h[k] = [] }
 
-      queue.finished_jobs.values.each do |finished_job|
-        aggregated_proximity_data = finished_job.result
-        aggregated_proximity_data.each do |center, aggregated_data|
-          sorted_aggregated_proximity_data[center] << aggregated_data
-        end
+      aggregated_proximity_data = job.run
+      aggregated_proximity_data.each do |center, aggregated_data|
+        sorted_aggregated_proximity_data[center] << aggregated_data
       end
 
       # calculate sum and nb elements for each center

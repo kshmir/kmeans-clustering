@@ -1,4 +1,4 @@
-require 'kmeans-clustering'
+load 'lib/kmeans-clustering.rb'
 
 # specify required operations
 KMeansClustering::calcSum = lambda do |elements|
@@ -34,5 +34,5 @@ centers = elements.sample(4)
 
 # apply 10 iterations of the k-means clustering algorithm
 # and split each iteration across 2 different processors
-new_centers = KMeansClustering::run(centers, elements, 10, 2)
+new_centers = KMeansClustering::run(centers, elements, 10)
 puts new_centers.to_s
